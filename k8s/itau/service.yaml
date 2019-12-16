@@ -1,0 +1,15 @@
+# service
+kind: Service
+apiVersion: v1
+metadata:
+  name: pipefy-github-app-service
+  namespace: default
+  labels:
+    run: pipefy-github-app-service
+spec:
+  ports:
+  - protocol: TCP
+    port: 80
+    targetPort: 5000
+  selector:
+    app: pipefy-github-app
