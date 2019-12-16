@@ -1,0 +1,87 @@
+kind: Deployment
+apiVersion: extensions/v1beta1
+metadata:
+  name: pipefy-github-app
+  labels:
+    app: pipefy-github-app
+spec:
+  replicas: 2
+  minReadySeconds: 5
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxSurge: 2
+      maxUnavailable: 1
+  revisionHistoryLimit: 5
+  selector:
+    matchLabels:
+      app: pipefy-github-app
+  template:
+    metadata:
+      name: pipefy-github-app
+      labels:
+        app: pipefy-github-app
+    spec:
+      containers:
+      - name: pipefy-github-app
+        image: git.pipefy.net:4567/pipefy/github-app:181c6b23
+        ports:
+        - containerPort: 5000
+        imagePullPolicy: Always
+        livenessProbe:
+          failureThreshold: 3
+          initialDelaySeconds: 30
+          periodSeconds: 3
+          successThreshold: 1
+          httpGet:
+            path: /manifest.json
+            port: 5000
+          timeoutSeconds: 1
+        readinessProbe:
+          failureThreshold: 3
+          initialDelaySeconds: 5
+          periodSeconds: 3
+          successThreshold: 1
+          httpGet:
+            path: /manifest.json
+            port: 5000
+        securityContext:
+          privileged: false
+        env:
+        - name: GITHUB_CLIENT_ID
+          valueFrom:
+            secretKeyRef:
+              name: pipefy-github-app-secrets
+              key: GITHUB_CLIENT_ID
+        - name: GITHUB_CLIENT_SECRET
+          valueFrom:
+            secretKeyRef:
+              name: pipefy-github-app-secrets
+              key: GITHUB_CLIENT_SECRET
+        - name: GITHUB_CALLBACK_URL
+          value: https://app-github.pipefy.com/oauth-callback
+        - name: PORT
+          value: "5000"
+        - name: NPM_CONFIG_LOGLEVEL
+          value: info
+        - name: NODE_VERBOSE
+          value: "false"
+        - name: NODE_ENV
+          value: production
+        - name: NODE_MODULES_CACHE
+          value: "true"
+        command:
+        - npm
+        args:
+        - start
+        resources:
+          requests:
+            memory: 80Mi
+            cpu: 80m
+          limits:
+            memory: 100Mi
+            cpu: 100m
+      imagePullSecrets:
+      - name: gitlab-ee-registry
+      restartPolicy: Always
+      terminationGracePeriodSeconds: 30
