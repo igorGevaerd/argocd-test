@@ -1,0 +1,14 @@
+apiVersion: extensions/v1beta1
+kind: Ingress
+metadata:
+  name: pipefy-github-app-ingress
+  namespace: default
+spec:
+  rules:
+  - host: app-github.pipefy.com
+    http:
+      paths:
+      - path: /
+        backend:
+          serviceName: pipefy-github-app-service
+          servicePort: 80
