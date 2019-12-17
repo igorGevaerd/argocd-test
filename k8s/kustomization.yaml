@@ -3,7 +3,6 @@ apiVersion: kustomize.config.k8s.io/v1beta1
 #resources:
 bases:
 #- https://github.com/igorGevaerd/argocd-test.git/k8s/itau/
-https://teste:3iCXCgYzG3Y6vK5GUGH3@git.pipefy.net/pipefy/github-app.git/k8s/itau/?ref=ig-master/improvement/st-deploy-stage
 
 
 namePrefix: teste-xxx-
